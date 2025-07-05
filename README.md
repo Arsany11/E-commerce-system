@@ -1,4 +1,4 @@
-# E-Commerce Checkout System (Fawry )
+# E-Commerce Checkout System 
 
 This project is a simple Java console-based e-commerce checkout system, built as part of the Fawry Rise Journey Full Stack Internship Challenge.
 

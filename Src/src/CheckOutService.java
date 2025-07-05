@@ -21,20 +21,19 @@ public class CheckOutService {
             Product p = item.getProduct();
             int qty = item.getQuantity();
 
-//            if ( p.) {
-//                System.out.printf("Error: %s is expired.\n", p.getName());
-//                return;
-//            }
+            if (p instanceof Expirable expirable && expirable.isExpired()) {
+                throw new IllegalStateException(p.getName() + " is expired.");
+            }
 
             if (qty > p.getQuantity()) {
                 System.out.printf("Error: %s is out of stock.\n", p.getName());
                 return;
             }
 
-            double lineTotal = p.getPrice() * qty;
-            subtotal += lineTotal;
+            double itemTotal = p.getPrice() * qty;
+            subtotal += itemTotal;
 
-            receiptLines.add(qty + "x " + p.getName() + " " + (int) lineTotal);
+            receiptLines.add(qty + "x " + p.getName() + " " + (int) itemTotal + "$");
 
             if (p instanceof Shippable s) {
                 double totalWeightKg = s.getWeight() * qty;
@@ -66,9 +65,9 @@ public class CheckOutService {
         System.out.println("** Checkout receipt **");
         receiptLines.forEach(System.out::println);
         System.out.println("----------------------");
-        System.out.printf("Subtotal %d\n", (int) subtotal);
-        System.out.printf("Shipping %d\n", (int) shippingCost);
-        System.out.printf("Amount %d\n", (int) total);
+        System.out.printf("Subtotal %d$ \n", (int) subtotal);
+        System.out.printf("Shipping %d$\n", (int) shippingCost);
+        System.out.printf("Amount %d$\n", (int) total);
 
         customer.clearCart();
     }

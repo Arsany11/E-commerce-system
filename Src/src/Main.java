@@ -1,15 +1,16 @@
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import java.time.LocalDate;
+
+
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        Product cheese = new Cheese("Cheese", 100.0, 10, LocalDate.now().plusDays(3), 0.2);
+        Product biscuits = new Biscuits("Biscuits", 150.0, 5, LocalDate.now().plusDays(5), 0.7);
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
-        }
+        Customer customer = new Customer("Arsany", 500.0);
+        customer.addToCart(cheese, 2);
+        customer.addToCart(biscuits, 1);
+
+        CheckOutService checkout = new CheckOutService();
+        checkout.checkout(customer);
     }
 }

@@ -12,33 +12,41 @@ public class CheckOutService {
         }
 
         double subtotal = 0;
-        double shippingFees = 0;
-        double shippingFeesPerKG = 1;
-        List<Shippable> itemsToShip = new ArrayList<>();
+        double totalShippingWeightKg = 0;
+        double shippingRatePerKg = 30.0;
+        List<String> shippingLines = new ArrayList<>();
+        List<String> receiptLines = new ArrayList<>();
 
         for (CartItem item : cart) {
             Product p = item.getProduct();
             int qty = item.getQuantity();
 
-            if (p instanceof Expirable expirable && expirable.isExpired()) {
-                System.out.printf("Error: %s is expired.\n", p.getName());
-                return;
-            }
+//            if ( p.) {
+//                System.out.printf("Error: %s is expired.\n", p.getName());
+//                return;
+//            }
 
             if (qty > p.getQuantity()) {
                 System.out.printf("Error: %s is out of stock.\n", p.getName());
                 return;
             }
 
-            subtotal += item.getTotalPrice();
+            double lineTotal = p.getPrice() * qty;
+            subtotal += lineTotal;
+
+            receiptLines.add(qty + "x " + p.getName() + " " + (int) lineTotal);
 
             if (p instanceof Shippable s) {
-                shippingFees += s.getWeight() * shippingFeesPerKG;
-                itemsToShip.add(s);
+                double totalWeightKg = s.getWeight() * qty;
+                int weightGrams = (int) (totalWeightKg * 1000);
+                shippingLines.add(qty + "x " + s.getName() + " " + weightGrams + "g");
+                totalShippingWeightKg += totalWeightKg;
             }
         }
 
-        double total = subtotal + shippingFees;
+        double shippingCost = totalShippingWeightKg * shippingRatePerKg;
+        double total = subtotal + shippingCost;
+
         if (customer.getBalance() < total) {
             System.out.println("Error: Insufficient balance.");
             return;
@@ -49,15 +57,18 @@ public class CheckOutService {
             item.getProduct().reduceQuantity(item.getQuantity());
         }
 
-        System.out.println("Checkout successful for " + customer.getName());
-        System.out.printf("Subtotal: $%.2f\n", subtotal);
-        System.out.printf("Shipping: $%.2f\n", shippingFees);
-        System.out.printf("Total Paid: $%.2f\n", total);
-        System.out.printf("Remaining Balance: $%.2f\n", customer.getBalance());
-
-        if (!itemsToShip.isEmpty()) {
-            ShippingService.ship(itemsToShip);
+        if (!shippingLines.isEmpty()) {
+            System.out.println("** Shipment notice **");
+            shippingLines.forEach(System.out::println);
+            System.out.printf("Total package weight %.1fkg\n\n", totalShippingWeightKg);
         }
+
+        System.out.println("** Checkout receipt **");
+        receiptLines.forEach(System.out::println);
+        System.out.println("----------------------");
+        System.out.printf("Subtotal %d\n", (int) subtotal);
+        System.out.printf("Shipping %d\n", (int) shippingCost);
+        System.out.printf("Amount %d\n", (int) total);
 
         customer.clearCart();
     }

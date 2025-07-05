@@ -22,4 +22,5 @@ public abstract class Product {
     public void reduceQuantity(int quantity) {
         this.quantity-=quantity;
     }
+//    public abstract boolean expirable ();
 }
